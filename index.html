@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="index.css">
+    <title>Editor Zero</title>
+</head>
+<body style="background-color: #232323;">
+    <windowControls>
+        <windowCloseButton>
+            <img src="close.png" alt="Close">
+        </windowCloseButton>
+        <windowMinimizeButton>
+            <img src="minimize.png" alt="Minimize">
+        </windowMinimizeButton>
+    </windowControls>
+    <content>
+
+    </content>
+    <script src="tabs.js"></script>
+    <script>
+        // Check if this is a browser, or Electron
+        try {
+            require("electron")
+        } catch (e) {
+            location.href = "no-browser.html"
+        }
+
+        // Get window
+        const win = require("electron").remote.getCurrentWindow()
+
+        // Set up window controls
+        const windowControls = document.querySelector("windowcontrols")
+        const windowCloseButton = document.querySelector("windowclosebutton")
+        const windowMinimizeButton = document.querySelector("windowminimizebutton")
+        windowCloseButton.onclick = (() => win.close())
+        windowMinimizeButton.onclick = (() => win.minimize())
+
+        // Disable default browser key bindings, and set key press events
+        window.onkeydown = keyDown
+        window.onkeyup = keyUp
+        window.onkeypress = ((e) => e.preventDefault())
+
+        // Show window
+        win.show()
+
+        // Handle keyDown events
+        function keyDown(e) {
+            e.preventDefault()
+        }
+        function keyUp(e) {
+            if (e.key === "w" && e.ctrlKey) {
+                if (Tabs.amount() === 1) {
+                    win.close()
+                } else {
+                    Tabs.currentTab().close()
+                }
+            }
+            e.preventDefault()
+        }
+
+        // Get content div
+        const content = document.querySelector("content")
+
+        // Initialize tabs
+        const Tabs = new tabs(content, windowControls)
+        Tabs.add("UrMom.html", "Ur momama", true)
+        Tabs.add("UrDad.js", "Ur momama", true)
+    </script>
+</body>
+</html>

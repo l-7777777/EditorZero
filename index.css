@@ -1,0 +1,60 @@
+windowclosebutton, windowminimizebutton {
+    width: 20px;
+    height: 20px;
+    padding: 8px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    font-family: sans-serif;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0);
+    font-size: 20px;
+    transition: background-color 125ms;
+    user-select: none;
+}
+
+windowclosebutton>img, windowminimizebutton>img {
+    width: 20px;
+    height: 20px;
+}
+
+windowminimizebutton {
+    right: 36px;
+}
+
+windowclosebutton:hover, windowminimizebutton:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+windowcontrols {
+    background-color: #343434;
+    width: 100vw;
+    height: 36px;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+tabelement {
+    background-color: #343434;
+    line-height: 36px;
+    color: white;
+    font-family: sans-serif;
+    padding-left: 5px;
+    position: fixed;
+    top: 0;
+    z-index: 2;
+    width: 200px;
+    height: 36px;
+    user-select: none;
+}
+
+tabelement:hover {
+    background-color: #454545;
+}
+
+tabelement.selected {
+    background-color: #565656;
+}
