@@ -15,7 +15,8 @@
         </windowMinimizeButton>
     </windowControls>
     <content>
-
+        <editor contenteditable></editor>
+        <lineNumbers></lineNumbers>
     </content>
     <script src="tabs.js"></script>
     <script>
@@ -36,36 +37,67 @@
         windowCloseButton.onclick = (() => win.close())
         windowMinimizeButton.onclick = (() => win.minimize())
 
-        // Disable default browser key bindings, and set key press events
+        // Set key press events
         window.onkeydown = keyDown
         window.onkeyup = keyUp
-        window.onkeypress = ((e) => e.preventDefault())
+        window.onkeypress = keyPress
 
         // Show window
         win.show()
 
         // Handle keyDown events
         function keyDown(e) {
-            e.preventDefault()
-        }
-        function keyUp(e) {
+            if (document.activeElement === editor) {
+                numberLines()
+                if (e.key === "Tab") {
+                    if (e.shiftKey) {
+                        window.getSelection().getRangeAt(0).setEnd(window.getSelection().getRangeAt(0).startContainer, window.getSelection().getRangeAt(0).startOffset)
+                        window.getSelection().getRangeAt(0).setStart(window.getSelection().getRangeAt(0).startContainer, window.getSelection().getRangeAt(0).startOffset - 1)
+                        window.getSelection().getRangeAt(0).deleteContents()
+                        e.preventDefault()
+                    } else {
+                        window.getSelection().getRangeAt(0).insertNode(document.createTextNode("\xa0\xa0\xa0\xa0"))
+                        window.getSelection().getRangeAt(0).setStart(window.getSelection().getRangeAt(0).endContainer, window.getSelection().getRangeAt(0).endOffset)
+                        e.preventDefault()
+                    }
+                }
+            }
             if (e.key === "w" && e.ctrlKey) {
                 if (Tabs.amount() === 1) {
                     win.close()
                 } else {
                     Tabs.currentTab().close()
                 }
+                e.preventDefault()
             }
-            e.preventDefault()
+        }
+        function keyUp(e) {
+
+        }
+        function keyPress(e) {
+
         }
 
-        // Get content div
-        const content = document.querySelector("content")
+        // Get editor tag
+        const editor = document.querySelector("editor")
 
         // Initialize tabs
-        const Tabs = new tabs(content, windowControls)
-        Tabs.add("UrMom.html", "Ur momama", true)
-        Tabs.add("UrDad.js", "Ur momama", true)
+        const Tabs = new tabs(editor, windowControls)
+        Tabs.add("welcome.txt", "Welcome<br>Welcome<br>Welcome<br>Welcome<br>Welcome<br>Welcome<br>Welcome<br>Welcome", true)
+        Tabs.add("JoeMama.html", "Joe Mama", true)
+
+        // Set up line numbers
+        numberLines()
+        function numberLines() {
+            const lineNumbers = document.querySelector("linenumbers")
+            lineNumbers.innerHTML = ""
+            const lines = editor.innerHTML.split("<br>").length
+            for (let i = 0; i < lines; i++) {
+                const lineNumber = document.createElement("lineNumber")
+                lineNumber.innerHTML = (i + 1) + "<br>"
+                lineNumbers.appendChild(lineNumber)
+            }
+        }
     </script>
 </body>
 </html>
