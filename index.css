@@ -24,7 +24,11 @@ windowminimizebutton {
     right: 36px;
 }
 
-windowclosebutton:hover, windowminimizebutton:hover {
+windowclosebutton:hover {
+    background-color: red;
+}
+
+windowminimizebutton:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -61,22 +65,43 @@ tabelement.selected {
 
 content {
     position: fixed;
-    top: 36px;
-    padding: 10px;
+    margin: 46px 10px 46px;
     width: 100vw;
     height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-editor {
+highlighting {
+    background-color: transparent;
     position: absolute;
     left: 50px;
     width: 100%;
-    height: 100%;
     color: white;
     font-family: monospace;
     line-height: 24px;
     outline: none;
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    z-index: 0;
+    padding: 0;
+}
+
+#editor {
+    background-color: transparent;
+    position: absolute;
+    left: 50px;
+    width: 100%;
+    height: 1000000vh;
+    padding: 0;
+    border: none;
+    color: transparent;
+    font-family: monospace;
+    line-height: 24px;
+    outline: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    z-index: 1;
 }
 
 linenumbers {
@@ -86,4 +111,68 @@ linenumbers {
 
 linenumber {
     line-height: 24px;
+}
+
+spellingerror {
+    border-bottom: 2px solid red;
+}
+
+cursoron {
+    border-right: 2px solid white;
+    margin-right: -2px;
+}
+
+tabclosebutton {
+    width: 10px;
+    height: 10px;
+    margin-left: 181px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 2px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    background-color: transparent;
+    line-height: 10px;
+    border-radius: 10px;
+}
+
+tabclosebutton:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+tabclosebutton>img {
+    width: 10px;
+    height: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+bottombar {
+    background-color: #343434;
+    width: 100vw;
+    height: 32px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+select#lang {
+    width: 10%;
+    height: 100%;
+    color: white;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+}
+
+select#lang:hover {
+    background-color: #454545;
+}
+
+select#lang>optgroup, select#lang>optgroup>option, select#lang>option {
+    background-color: #343434;
+    border: none;
 }

@@ -15,10 +15,28 @@
         </windowMinimizeButton>
     </windowControls>
     <content>
-        <editor contenteditable></editor>
+        <textarea id="editor" contenteditable spellcheck="false"></textarea>
+        <highlighting></highlighting>
         <lineNumbers></lineNumbers>
     </content>
+    <bottomBar>
+        <select id="lang">
+            <option value="plaintext">Plain Text</option>
+            <optgroup label="MarkDown">
+                <option value="md/wysiwyg">MarkDown/WYSIWYG</option>
+                <option value="md/text">MarkDown/Text</option>
+            </optgroup>
+            <optgroup label="ECMAScript">
+                <option value="es/es6">ECMAScript/ES6 (2015)</option>
+                <option value="es/es7">ECMAScript/ES7 (2016)</option>
+                <option value="es/es8">ECMAScript/ES8 (2017)</option>
+                <option value="es/es9">ECMAScript/ES9 (2019)</option>
+            </optgroup>
+        </select>
+    </bottomBar>
     <script src="tabs.js"></script>
+    <script src="FileAssociations.js"></script>
+    <script src="syntaxHighlighting.js"></script>
     <script>
         // Check if this is a browser, or Electron
         try {
@@ -41,14 +59,19 @@
         window.onkeydown = keyDown
         window.onkeyup = keyUp
         window.onkeypress = keyPress
+        window.onmousedown = mouseDown
 
         // Show window
         win.show()
 
+        // Modifier keys
+        const modifierKeys = ["Control", "Alt", "Shift", "CapsLock"]
+
         // Handle keyDown events
         function keyDown(e) {
             if (document.activeElement === editor) {
-                numberLines()
+                setTimeout(updateHighlighting, 10)
+                setTimeout(saveToMemory, 10)
                 if (e.key === "Tab") {
                     if (e.shiftKey) {
                         window.getSelection().getRangeAt(0).setEnd(window.getSelection().getRangeAt(0).startContainer, window.getSelection().getRangeAt(0).startOffset)
@@ -60,6 +83,19 @@
                         window.getSelection().getRangeAt(0).setStart(window.getSelection().getRangeAt(0).endContainer, window.getSelection().getRangeAt(0).endOffset)
                         e.preventDefault()
                     }
+                } else if (e.key === "Enter") {
+                    editor.value = editor.value.substr(0, editor.selectionStart) + "\n" + editor.value.substr(editor.selectionStart + 1)
+                    if ((editor.value.split(/\n(?!$)/).length + 1) * 24 > document.querySelector("content").clientHeight / 4 * 3) {
+                        document.querySelector("content").scrollTop += 24
+                    }
+                    numberLines(1)
+                    e.preventDefault()
+                } else if (e.key === "Backspace") {
+                    numberLines(0)
+                } else if (editor.value.split("")[editor.selectionStart - 1] === "\n") {
+                    numberLines(1)
+                } else if (!modifierKeys.includes(e.key)) {
+                    numberLines(0)
                 }
             }
             if (e.key === "w" && e.ctrlKey) {
@@ -77,26 +113,65 @@
         function keyPress(e) {
 
         }
+        function mouseDown(e) {
+            setTimeout(updateHighlighting, 10)
+        }
 
         // Get editor tag
-        const editor = document.querySelector("editor")
+        const editor = document.querySelector("#editor")
+
+        // Get type selector tag
+        const langSelect = document.querySelector("select#lang")
 
         // Initialize tabs
-        const Tabs = new tabs(editor, windowControls)
-        Tabs.add("welcome.txt", "Welcome<br>Welcome<br>Welcome<br>Welcome<br>Welcome<br>Welcome<br>Welcome<br>Welcome", true)
-        Tabs.add("JoeMama.html", "Joe Mama", true)
+        const Tabs = new tabs(editor, windowControls, win)
+        Tabs.add("Welcome.md", "Welcome\nWelcome to EditorZero", true)
+        Tabs.add("Welcome.txt", "Welcome\nWelcome to EditorZero", true)
 
         // Set up line numbers
-        numberLines()
-        function numberLines() {
+        numberLines(0)
+        function numberLines(mod) {
             const lineNumbers = document.querySelector("linenumbers")
             lineNumbers.innerHTML = ""
-            const lines = editor.innerHTML.split("<br>").length
+            const lines = editor.value.split(/\n(?!$)/).length + mod
             for (let i = 0; i < lines; i++) {
                 const lineNumber = document.createElement("lineNumber")
                 lineNumber.innerHTML = (i + 1) + "<br>"
                 lineNumbers.appendChild(lineNumber)
             }
+        }
+
+        // Set up highlighted div
+        updateHighlighting()
+        function updateHighlighting(forward) {
+            const highlightContainer = document.querySelector("highlighting")
+            if (editor.selectionStart) {
+                highlightContainer.textContent = editor.value.substr(0, editor.selectionStart - 1) + "<cursorOn>" + editor.value.substr(editor.selectionStart - 1, 1).replace("\n", editor.value.substr(editor.selectionStart, 1) ? "<br>" : "<br><br>") + "</cursorOn>" + editor.value.substr(editor.selectionStart)
+            } else {
+                highlightContainer.textContent = editor.value
+            }
+            highlightContainer.innerHTML = highlight(getType(), highlightContainer.textContent)
+        }
+
+        // Set up language selection
+        getType()
+        function getType() {
+            if (FileAssociations[Tabs.currentTab().name.split(".")[Tabs.currentTab().name.split(".").length - 1]]) {
+                langSelect.value = FileAssociations[Tabs.currentTab().name.split(".")[Tabs.currentTab().name.split(".").length - 1]]
+                return FileAssociations[Tabs.currentTab().name.split(".")[Tabs.currentTab().name.split(".").length - 1]]
+            }
+        }
+
+        // Make cursor blink
+        setInterval(() => {
+            if (document.querySelector("cursoron")) {
+                document.querySelector("cursoron").style.borderRight = document.querySelector("cursoron").style.borderRight === "2px solid transparent" ? "2px solid white" : "2px solid transparent"
+            }
+        }, 530)
+
+        // Save tab contents to memory
+        function saveToMemory() {
+            Tabs.setContent(Tabs.currentTab().name, editor.value)
         }
     </script>
 </body>

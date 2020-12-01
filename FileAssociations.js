@@ -1,0 +1,5 @@
+const FileAssociations = {
+    txt: "plaintext",
+    md: "md/wysiwyg",
+    js: "es/2019"
+}
